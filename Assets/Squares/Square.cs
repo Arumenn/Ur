@@ -5,7 +5,7 @@ using UnityEngine;
 public class Square : MonoBehaviour {
 
     [SerializeField] public SquareType squareType = SquareType.Normal;
-    [SerializeField] public SquareTerritory squareTerritory = SquareTerritory.Neutral;
+    [SerializeField] public int squareTerritory = 0;
 
     public Pawn currentPawn = null;
     public int position = 0;
@@ -30,19 +30,25 @@ public class Square : MonoBehaviour {
 
 	}
 
-    public void switchWith(Pawn replacement) {
+    public bool switchWith(Pawn replacement) {
         if (currentPawn == null) {
             currentPawn = replacement;
             Debug.Log("Set current spawn to " + replacement.name);
-        } else {
+            return true;
+        } else if (currentPawn == replacement) {
+            Debug.Log("Not switching anything, " + replacement.name + " is already on that square");
+            currentPawn = replacement;
+            replacement.pawnState = PawnState.inPlay;
+            return false;
+        } else { 
             Debug.Log("Switching " + currentPawn.name + " for " + replacement.name);
             currentPawn.pushOut();
             currentPawn = replacement;
             replacement.pawnState = PawnState.inPlay;
+            return true;
         }
     }
     
 }
 
 public enum SquareType { Normal, Rosette, Enter, Exit }
-public enum SquareTerritory { Neutral, Player1, Player2 }

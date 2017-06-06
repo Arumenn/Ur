@@ -39,9 +39,10 @@ public class Pawn : MonoBehaviour {
             } else if (gm.currentlySelectedPawn == this) {
                 if ((currentSquare != null) && (currentSquare.position >= lastPosition)) {
                     Debug.Log("Valid square clicked for " + name);
-                    gm.currentlySelectedPawn = null;
-                    PlacePawn();
-                    gm.togglePlayer();
+                    if (PlacePawn()) {
+                        gm.currentlySelectedPawn = null;
+                        gm.togglePlayer();
+                    }
                 } else {
                     pawnState = PawnState.waiting;
                     Debug.Log("Invalid placement clicked for " + name);
@@ -56,37 +57,44 @@ public class Pawn : MonoBehaviour {
         }
     }
 
-    private void PlacePawn() {
+    private bool PlacePawn() {
         Debug.Log("Request to place pawn " + name + "...");
         if (currentSquare != null) {
-            if ((currentSquare.isOccupied)) {
-                Debug.Log("Square " + currentSquare.position + " is occupied...");
-                if (currentSquare.currentPawn == this) {
-                    Debug.Log("by me.");
-                    Snap();
-                    pawnState = PawnState.inPlay;
-                } else if (currentSquare.currentPawn.playerOwner != playerOwner) {
-                    Debug.Log("by an other player's pawn");
-                    Snap();
+            if ((currentSquare.squareTerritory == 0) || (currentSquare.squareTerritory == playerOwner)) {
+                if ((currentSquare.isOccupied)) {
+                    Debug.Log("Square " + currentSquare.position + " is occupied...");
+                    if (currentSquare.currentPawn == this) {
+                        Debug.Log("by me.");
+                        return Snap();
+                    } else if (currentSquare.currentPawn.playerOwner != playerOwner) {
+                        Debug.Log("by an other player's pawn");
+                        return Snap();
+                    }
+                } else {
+                    Debug.Log("Square " + currentSquare.position + " is free...");
+                    pawnState = PawnState.waiting;
+                    return Snap();
                 }
-            }else {
-                Debug.Log("Square " + currentSquare.position + " is free...");
-                Snap();
-                pawnState = PawnState.waiting;
+            } else {
+                Debug.Log("Not your territory.");
+                return false;
             }
         } else {
             Debug.Log("No square to place on.");
         }
+        return false;
     }
 
-    private void Snap() {
+    private bool Snap() {
         if (currentSquare != null) {
             //snap it
             Vector3 snapPosition = new Vector3(currentSquare.transform.position.x, currentSquare.transform.position.y + 0.15f, currentSquare.transform.position.z);
             transform.position = snapPosition;
             lastPosition = currentSquare.position;
-            currentSquare.switchWith(this);
             print("Snapping " + name + " to position " + lastPosition);
+            return currentSquare.switchWith(this);
+        } else {
+            return false;
         }
     }
 
