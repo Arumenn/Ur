@@ -8,6 +8,7 @@ public class Square : MonoBehaviour {
     [SerializeField] public SquareTerritory squareTerritory = SquareTerritory.Neutral;
 
     public Pawn currentPawn = null;
+    public int position = 0;
 
     private GameManager gm;
 
@@ -28,35 +29,19 @@ public class Square : MonoBehaviour {
 	void Update () {
 
 	}
+
+    public void switchWith(Pawn replacement) {
+        if (currentPawn == null) {
+            currentPawn = replacement;
+            Debug.Log("Set current spawn to " + replacement.name);
+        } else {
+            Debug.Log("Switching " + currentPawn.name + " for " + replacement.name);
+            currentPawn.pushOut();
+            currentPawn = replacement;
+            replacement.pawnState = PawnState.inPlay;
+        }
+    }
     
-    /*private void OnTriggerEnter(Collider other) {
-        if (other.gameObject.GetComponent<Pawn>()) {
-            if (!isOccupied) {
-                currentPawn = other.gameObject.GetComponent<Pawn>();
-            }
-        }
-    }
-
-    private void OnTriggerStay(Collider other) {
-        if ((gm.currentlySelectedPawn == currentPawn) && (currentPawn != null)) {
-            if ((isOccupied) && (other.gameObject.GetComponent<Pawn>() == currentPawn)) {
-                //snap it
-                Vector3 snapPosition = new Vector3(transform.position.x, transform.position.y + 0.15f, transform.position.z);
-                other.gameObject.transform.position = snapPosition;
-                print("Snapping " + other.name);
-            } else {
-                print("Won't snap here");
-            }
-        }
-    }
-
-    private void OnTriggerExit(Collider other) {
-        if (other.gameObject.GetComponent<Pawn>()) {
-            if ((isOccupied) && (other.gameObject.GetComponent<Pawn>() == currentPawn)) {
-                currentPawn = null;
-            }
-        }
-    }*/
 }
 
 public enum SquareType { Normal, Rosette, Enter, Exit }
