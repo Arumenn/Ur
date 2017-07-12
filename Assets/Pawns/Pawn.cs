@@ -9,7 +9,9 @@ public class Pawn : MonoBehaviour {
     public Square currentSquare = null;
 
     private GameManager gm;
-    public int lastPosition = 0;
+    private float heightOffset = 0.15f;
+    private float groundOffset = -0.25f;
+    [SerializeField] private int lastPosition = 0;
 
     // Use this for initialization
     void Start () {
@@ -20,7 +22,7 @@ public class Pawn : MonoBehaviour {
 	void Update () {
         if (gm.currentlySelectedPawn == this) {
             //Isometric mouse to game
-            Plane ground = new Plane(Vector3.up, -0.15f);
+            Plane ground = new Plane(Vector3.up, groundOffset);
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             float dist;
             ground.Raycast(ray, out dist);
@@ -38,10 +40,20 @@ public class Pawn : MonoBehaviour {
                 Debug.Log("Picked up " + name);
             } else if (gm.currentlySelectedPawn == this) {
                 if ((currentSquare != null) && (currentSquare.position >= lastPosition)) {
-                    Debug.Log("Valid square clicked for " + name);
-                    if (PlacePawn()) {
-                        gm.currentlySelectedPawn = null;
-                        gm.togglePlayer();
+                    int moveCost = currentSquare.position - lastPosition;
+                    if (moveCost > gm.movesRemaining) {
+                        Debug.LogWarning("Not enough moves remaining");
+                    } else {
+                        Debug.Log("Valid square clicked for " + name);
+                        if (PlacePawn()) {
+                            gm.currentlySelectedPawn = null;
+                            if (currentSquare.squareType == SquareType.Rosette) {
+                                //Allow reroll
+                                Debug.Log("Landed on a rosette, added 3 moves moves");
+                                gm.movesRemaining += 3; //TODO
+                            }
+                            gm.consumeMoves(moveCost);
+                        }
                     }
                 } else {
                     pawnState = PawnState.waiting;
@@ -88,7 +100,7 @@ public class Pawn : MonoBehaviour {
     private bool Snap() {
         if (currentSquare != null) {
             //snap it
-            Vector3 snapPosition = new Vector3(currentSquare.transform.position.x, currentSquare.transform.position.y + 0.15f, currentSquare.transform.position.z);
+            Vector3 snapPosition = new Vector3(currentSquare.transform.position.x, currentSquare.transform.position.y + heightOffset, currentSquare.transform.position.z);
             transform.position = snapPosition;
             lastPosition = currentSquare.position;
             print("Snapping " + name + " to position " + lastPosition);
