@@ -15,6 +15,12 @@ public class Pawn : MonoBehaviour {
     [SerializeField] private int lastPosition = 0;
     private Vector3 originalPosition;
 
+    //for undo
+    private Vector3 lastKnownTransform;
+    private Square lastSquare = null;
+    private PawnState lastPawnState;
+    private int lastKnownPosition;    
+
     // Use this for initialization
     void Start () {
         gm = GameObject.FindObjectOfType<GameManager>();
@@ -36,12 +42,26 @@ public class Pawn : MonoBehaviour {
 	}
 
     private void OnMouseDown() {
-        if (Input.GetKeyDown(KeyCode.Mouse0) && (gm.currentPlayer == playerOwner)) {
+        if (gm.currentPlayer != playerOwner) {
+            return;
+        }
+
+        if (Input.GetMouseButtonDown(0)) {
             Debug.Log("Clicked " + name + " (currentSquare=" + currentSquare + "; State=" + pawnState + ")");
+            if (gm.movesRemaining <= 0) {
+                Debug.Log("No moves remaining");
+                return;
+            }
             if (gm.currentlySelectedPawn == null) {
+                Debug.Log("Picked up " + name);
+                //saves last known infos
+                lastKnownTransform = transform.position;
+                lastPawnState = pawnState;
+                lastSquare = currentSquare;
+                lastKnownPosition = lastPosition;
+                //sets to moving
                 gm.currentlySelectedPawn = this;
                 pawnState = PawnState.waiting;
-                Debug.Log("Picked up " + name);
             } else if (gm.currentlySelectedPawn == this) {
                 if ((currentSquare != null) && (currentSquare.position >= lastPosition)) {
                     int moveCost = currentSquare.position - lastPosition;
@@ -58,12 +78,6 @@ public class Pawn : MonoBehaviour {
                     pawnState = PawnState.waiting;
                     Debug.Log("Invalid placement clicked for " + name);
                 }
-            }
-        } else {
-            if (Input.GetKeyDown(KeyCode.Mouse1) && (gm.currentPlayer == playerOwner) && (gm.currentlySelectedPawn == this)) {
-                //cancel movement
-                //TODO code for cancel movement
-                Debug.Log("Cancel movement NOT DONE YET");
             }
         }
     }
@@ -107,6 +121,20 @@ public class Pawn : MonoBehaviour {
         } else {
             return false;
         }
+    }
+
+    public void cancelMovement() {
+        //cancel movement
+        //restores last known infos
+        if (lastSquare != null) {
+            lastSquare.switchWith(this);
+        }
+        transform.position = lastKnownTransform;
+        pawnState = lastPawnState;
+        currentSquare = lastSquare;
+        lastPosition = lastKnownPosition;
+        gm.currentlySelectedPawn = null;
+        Debug.Log("Cancelled movement");
     }
 
     private void OnTriggerEnter(Collider other) {

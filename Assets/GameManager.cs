@@ -44,7 +44,13 @@ public class GameManager : MonoBehaviour {
                 uiRollResult.gameObject.SetActive(false);
             }
         }
-	}
+
+
+        if ((currentlySelectedPawn != null) && (currentlySelectedPawn.playerOwner == currentPlayer) && (Input.GetMouseButtonDown(1))) {
+            Debug.Log("Right click");
+            currentlySelectedPawn.cancelMovement();
+        }
+    }
 
     public void togglePlayer() {
         if (currentPlayer == 1) { currentPlayer = 2; } else { currentPlayer = 1; }
