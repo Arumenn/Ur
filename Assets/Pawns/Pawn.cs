@@ -12,10 +12,12 @@ public class Pawn : MonoBehaviour {
     private float heightOffset = 0.15f;
     private float groundOffset = -0.25f;
     [SerializeField] private int lastPosition = 0;
+    private Vector3 originalPosition;
 
     // Use this for initialization
     void Start () {
         gm = GameObject.FindObjectOfType<GameManager>();
+        originalPosition = transform.position;
 	}
 	
 	// Update is called once per frame
@@ -47,12 +49,7 @@ public class Pawn : MonoBehaviour {
                         Debug.Log("Valid square clicked for " + name);
                         if (PlacePawn()) {
                             gm.currentlySelectedPawn = null;
-                            if (currentSquare.squareType == SquareType.Rosette) {
-                                //Allow reroll
-                                Debug.Log("Landed on a rosette, added 3 moves moves");
-                                gm.movesRemaining += 3; //TODO
-                            }
-                            gm.consumeMoves(moveCost);
+                            gm.consumeMoves(moveCost, currentSquare.squareType);
                         }
                     }
                 } else {
@@ -137,9 +134,10 @@ public class Pawn : MonoBehaviour {
 
     public void pushOut() {
         Debug.Log(name + " is dead");
-        pawnState = PawnState.finished;
+        pawnState = PawnState.waiting;
         currentSquare = null;
-        GameObject.Destroy(gameObject);
+        transform.position = originalPosition;
+        lastPosition = 0;
     }
 
 }
