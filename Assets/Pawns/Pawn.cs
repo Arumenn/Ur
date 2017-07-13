@@ -9,6 +9,7 @@ public class Pawn : MonoBehaviour {
     public Square currentSquare = null;
 
     private GameManager gm;
+    private GameCamera gc;
     private float heightOffset = 0.15f;
     private float groundOffset = -0.25f;
     [SerializeField] private int lastPosition = 0;
@@ -17,6 +18,7 @@ public class Pawn : MonoBehaviour {
     // Use this for initialization
     void Start () {
         gm = GameObject.FindObjectOfType<GameManager>();
+        gc = GameObject.FindObjectOfType<GameCamera>();
         originalPosition = transform.position;
 	}
 	
@@ -25,7 +27,7 @@ public class Pawn : MonoBehaviour {
         if (gm.currentlySelectedPawn == this) {
             //Isometric mouse to game
             Plane ground = new Plane(Vector3.up, groundOffset);
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = gc.getCurrentCamera().ScreenPointToRay(Input.mousePosition);
             float dist;
             ground.Raycast(ray, out dist);
             Vector3 pos = ray.GetPoint(dist);
