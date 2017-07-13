@@ -42,7 +42,7 @@ public class Pawn : MonoBehaviour {
 	}
 
     private void OnMouseDown() {
-        if (gm.currentPlayer != playerOwner) {
+        if ((gm.currentPlayer != playerOwner) && (pawnState != PawnState.finished)) {
             return;
         }
 
@@ -124,7 +124,6 @@ public class Pawn : MonoBehaviour {
     }
 
     public void cancelMovement() {
-        //cancel movement
         //restores last known infos
         if (lastSquare != null) {
             lastSquare.switchWith(this);
@@ -156,15 +155,15 @@ public class Pawn : MonoBehaviour {
             Debug.Log(name + " leaving " + square.position);
             if (currentSquare == square) {
                 currentSquare = null;
-                square.currentPawn = null;
+                other.gameObject.GetComponent<Square>().currentPawn = null;
             }
         }
-
     }
 
     public void pushOut() {
         Debug.Log(name + " is dead");
         pawnState = PawnState.waiting;
+        currentSquare.currentPawn = null;
         currentSquare = null;
         transform.position = originalPosition;
         lastPosition = 0;

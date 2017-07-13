@@ -100,5 +100,9 @@ public class GameManager : MonoBehaviour {
         uiRollResult.text = "YOU ROLLED " + movesRemaining;
         animateRollResult = true;
         animateRollResultTimeStarted = Time.time;
+        if (movesRemaining == 0) {
+            uiRollResult.text = uiRollResult.text + " :(";
+            Invoke("togglePlayer", TIMETOWAIT_ROLLRESULT);
+        }
     }
 }
