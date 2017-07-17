@@ -48,7 +48,14 @@ public class Square : MonoBehaviour {
             return true;
         }
     }
-    
+
+    private void OnDrawGizmos() {
+        if (isOccupied) {
+            Gizmos.color = Color.white;
+            Gizmos.DrawCube(transform.position, new Vector3(0.3f, 0.3f, 0.3f));
+        }
+    }
+
 }
 
 public enum SquareType { Normal, Rosette, Enter, Exit }

@@ -112,6 +112,11 @@ public class Pawn : MonoBehaviour {
 
     private bool Snap() {
         if (currentSquare != null) {
+            //removing from previous square
+            if (lastSquare != null) {
+                Debug.Log("Removing from square " + lastSquare.position);
+                lastSquare.currentPawn = null;
+            }
             //snap it
             Vector3 snapPosition = new Vector3(currentSquare.transform.position.x, currentSquare.transform.position.y + heightOffset, currentSquare.transform.position.z);
             transform.position = snapPosition;
