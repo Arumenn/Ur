@@ -32,8 +32,14 @@ public class Square : MonoBehaviour {
 
     public bool switchWith(Pawn replacement) {
         if (currentPawn == null) {
-            currentPawn = replacement;
-            Debug.Log("Set current spawn to " + replacement.name);
+            if (squareType == SquareType.Home) {
+                Debug.Log(replacement.name + " is now home!");
+                replacement.gotHome();
+                gm.scorePoint();
+            } else {
+                currentPawn = replacement;
+                Debug.Log("Set current spawn to " + replacement.name);
+            }
             return true;
         } else if (currentPawn == replacement) {
             Debug.Log("Not switching anything, " + replacement.name + " is already on that square");
@@ -58,4 +64,4 @@ public class Square : MonoBehaviour {
 
 }
 
-public enum SquareType { Normal, Rosette, Enter, Exit }
+public enum SquareType { Normal, Rosette, Enter, Exit, Home }

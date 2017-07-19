@@ -53,6 +53,15 @@ public class Pawn : MonoBehaviour {
                 return;
             }
             if (gm.currentlySelectedPawn == null) {
+                //are we near the end?
+                if (currentSquare != null) {
+                    int distanceToOutside = 15 - currentSquare.position; //15 is outside the 14 squares, so past the finish line
+                    if ((distanceToOutside <= 4) && (gm.movesRemaining > distanceToOutside)) {
+                        //an exact throw is needed to get a pawn home
+                        Debug.LogWarning("You need an exact throw of " + distanceToOutside + " to move this pawn home");
+                        return;
+                    }
+                }
                 Debug.Log("Picked up " + name);
                 //saves last known infos
                 lastKnownTransform = transform.position;
@@ -174,6 +183,10 @@ public class Pawn : MonoBehaviour {
         currentSquare = null;
         transform.position = originalPosition;
         lastPosition = 0;
+    }
+
+    public void gotHome() {
+        Destroy(this.gameObject);
     }
 
 }

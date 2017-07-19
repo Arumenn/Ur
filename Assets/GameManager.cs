@@ -10,10 +10,14 @@ public class GameManager : MonoBehaviour {
     public Button uiRollDice;
     public Text uiRollResult;
     public Button uiSkipTurn;
+    public Text uiWinText;
 
     public int currentPlayer = 1;
     public Pawn currentlySelectedPawn = null;
     public int movesRemaining = 0; //will be updated when dice rolled
+
+    public int scorePlayer1 = 0;
+    public int scorePlayer2 = 0;
 
     private Color colorPlayer1 = new Color(255, 0, 90);
     private Color colorPlayer2 = new Color(0, 139, 255);
@@ -28,6 +32,7 @@ public class GameManager : MonoBehaviour {
         uiRollDice.gameObject.SetActive(true);
         uiRollResult.gameObject.SetActive(false);
         uiSkipTurn.gameObject.SetActive(false);
+        uiWinText.gameObject.SetActive(false);
     }
 	
 	// Update is called once per frame
@@ -81,6 +86,21 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    public void scorePoint() {
+        Debug.Log("Player " + currentPlayer + " has got 1 pawn home!");
+        if (currentPlayer == 1) {
+            scorePlayer1++;
+            if (scorePlayer1 == 7) {
+                Win();
+            }
+        } else {
+            scorePlayer2++;
+            if (scorePlayer2 == 7) {
+                Win();
+            }
+        }
+    }
+
     public int rollDice() {
         int whiteCorners = 0;
         int dieResult = 0;
@@ -110,12 +130,22 @@ public class GameManager : MonoBehaviour {
         uiRollDice.gameObject.SetActive(false);
         uiRollResult.gameObject.SetActive(true);
         uiRollResult.text = "YOU ROLLED " + movesRemaining;
-        uiSkipTurn.gameObject.SetActive(true);
         animateRollResult = true;
         animateRollResultTimeStarted = Time.time;
         if (movesRemaining == 0) {
             uiRollResult.text = uiRollResult.text + " :(";
             Invoke("togglePlayer", TIMETOWAIT_ROLLRESULT);
+        } else {
+            uiSkipTurn.gameObject.SetActive(true);
         }
+    }
+
+    public void Win() {
+        uiWinText.text = "PLAYER " + currentPlayer + " WINS!";
+        uiWinText.gameObject.SetActive(true);
+        uiRollDice.gameObject.SetActive(false);
+        uiRollResult.gameObject.SetActive(false);
+        uiSkipTurn.gameObject.SetActive(false);
+        currentPlayer = 0;
     }
 }
