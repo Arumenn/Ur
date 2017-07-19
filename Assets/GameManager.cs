@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour {
     public Text uiMovementsLeft;
     public Button uiRollDice;
     public Text uiRollResult;
+    public Button uiSkipTurn;
 
     public int currentPlayer = 1;
     public Pawn currentlySelectedPawn = null;
@@ -26,6 +27,7 @@ public class GameManager : MonoBehaviour {
         currentPlayer = 1;
         uiRollDice.gameObject.SetActive(true);
         uiRollResult.gameObject.SetActive(false);
+        uiSkipTurn.gameObject.SetActive(false);
     }
 	
 	// Update is called once per frame
@@ -56,6 +58,7 @@ public class GameManager : MonoBehaviour {
         if (currentPlayer == 1) { currentPlayer = 2; } else { currentPlayer = 1; }
         uiRollDice.gameObject.SetActive(true);
         uiRollResult.gameObject.SetActive(false);
+        uiSkipTurn.gameObject.SetActive(false);
         animateRollResult = false;
         Debug.Log("Current player is now " + currentPlayer);
     }
@@ -68,6 +71,7 @@ public class GameManager : MonoBehaviour {
             //Allow reroll
             Debug.Log("Landed on a rosette, re-rolled");
             uiRollDice.gameObject.SetActive(true);
+            uiSkipTurn.gameObject.SetActive(false);
         } else {
             if (movesRemaining <= 0) {
                 togglePlayer();
@@ -93,11 +97,20 @@ public class GameManager : MonoBehaviour {
         return whiteCorners;
     }
 
+    public void buttonSkipTurn() {
+        if (currentlySelectedPawn != null) {
+            currentlySelectedPawn.cancelMovement();
+            currentlySelectedPawn = null;
+        }
+        togglePlayer();
+    }
+
     public void buttonRollDice() {
         movesRemaining = rollDice();
         uiRollDice.gameObject.SetActive(false);
         uiRollResult.gameObject.SetActive(true);
         uiRollResult.text = "YOU ROLLED " + movesRemaining;
+        uiSkipTurn.gameObject.SetActive(true);
         animateRollResult = true;
         animateRollResultTimeStarted = Time.time;
         if (movesRemaining == 0) {

@@ -67,6 +67,8 @@ public class Pawn : MonoBehaviour {
                     int moveCost = currentSquare.position - lastPosition;
                     if (moveCost > gm.movesRemaining) {
                         Debug.LogWarning("Not enough moves remaining");
+                    } else if (moveCost < gm.movesRemaining) {
+                        Debug.LogWarning("You have to use all the moves");
                     } else {
                         Debug.Log("Valid square clicked for " + name);
                         if (PlacePawn()) {
