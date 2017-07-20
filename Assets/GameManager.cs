@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour {
     public Text uiRollResult;
     public Button uiSkipTurn;
     public Text uiWinText;
+    public Text uiPlayer1Score;
+    public Text uiPlayer2Score;
 
     public int currentPlayer = 1;
     public Pawn currentlySelectedPawn = null;
@@ -33,6 +35,9 @@ public class GameManager : MonoBehaviour {
         uiRollResult.gameObject.SetActive(false);
         uiSkipTurn.gameObject.SetActive(false);
         uiWinText.gameObject.SetActive(false);
+
+        uiPlayer1Score.color = colorPlayer1;
+        uiPlayer2Score.color = colorPlayer2;
     }
 	
 	// Update is called once per frame
@@ -44,6 +49,9 @@ public class GameManager : MonoBehaviour {
         } else {
             uiPlayerName.color = colorPlayer2;
         }
+
+        uiPlayer1Score.text = "Player 1 Score: " + scorePlayer1 + "/7";
+        uiPlayer2Score.text = "Player 2 Score: " + scorePlayer2 + "/7";
 
         if (animateRollResult) {
             if (Time.time - animateRollResultTimeStarted > TIMETOWAIT_ROLLRESULT) {
