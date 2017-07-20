@@ -42,16 +42,17 @@ public class GameManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        uiPlayerName.text = "Player " + currentPlayer;
-        uiMovementsLeft.text = "Moves left: " + movesRemaining;
+        //uiPlayerName.text = "Player " + currentPlayer;
+        uiPlayerName.text = LocalizationManager.instance.GetLocalizedValue("current_player", currentPlayer.ToString());
+        uiMovementsLeft.text = LocalizationManager.instance.GetLocalizedValue("moves_remaining", movesRemaining.ToString());
         if (currentPlayer == 1) {
             uiPlayerName.color = colorPlayer1;
         } else {
             uiPlayerName.color = colorPlayer2;
         }
 
-        uiPlayer1Score.text = "Player 1 Score: " + scorePlayer1 + "/7";
-        uiPlayer2Score.text = "Player 2 Score: " + scorePlayer2 + "/7";
+        uiPlayer1Score.text = LocalizationManager.instance.GetLocalizedValue("score_player", "1", scorePlayer1.ToString());
+        uiPlayer2Score.text = LocalizationManager.instance.GetLocalizedValue("score_player", "2", scorePlayer2.ToString());
 
         if (animateRollResult) {
             if (Time.time - animateRollResultTimeStarted > TIMETOWAIT_ROLLRESULT) {
@@ -137,7 +138,7 @@ public class GameManager : MonoBehaviour {
         movesRemaining = rollDice();
         uiRollDice.gameObject.SetActive(false);
         uiRollResult.gameObject.SetActive(true);
-        uiRollResult.text = "YOU ROLLED " + movesRemaining;
+        uiRollResult.text = LocalizationManager.instance.GetLocalizedValue("roll_result", movesRemaining.ToString());
         animateRollResult = true;
         animateRollResultTimeStarted = Time.time;
         if (movesRemaining == 0) {
@@ -149,7 +150,7 @@ public class GameManager : MonoBehaviour {
     }
 
     public void Win() {
-        uiWinText.text = "PLAYER " + currentPlayer + " WINS!";
+        uiWinText.text = LocalizationManager.instance.GetLocalizedValue("player_win", currentPlayer.ToString());
         uiWinText.gameObject.SetActive(true);
         uiRollDice.gameObject.SetActive(false);
         uiRollResult.gameObject.SetActive(false);
