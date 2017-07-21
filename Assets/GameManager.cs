@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour {
     public int currentPlayer = 1;
     public Pawn currentlySelectedPawn = null;
     public int movesRemaining = 0; //will be updated when dice rolled
+    private bool canRoll = false;
 
     public int scorePlayer1 = 0;
     public int scorePlayer2 = 0;
@@ -35,6 +36,7 @@ public class GameManager : MonoBehaviour {
         uiRollResult.gameObject.SetActive(false);
         uiSkipTurn.gameObject.SetActive(false);
         uiWinText.gameObject.SetActive(false);
+        canRoll = true;
 
         uiPlayer1Score.color = colorPlayer1;
         uiPlayer2Score.color = colorPlayer2;
@@ -66,6 +68,10 @@ public class GameManager : MonoBehaviour {
             Debug.Log("Right click");
             currentlySelectedPawn.cancelMovement();
         }
+
+        if ((canRoll) && (Input.GetKeyDown(KeyCode.Space))) {
+            buttonRollDice();
+        }
     }
 
     public void togglePlayer() {
@@ -73,6 +79,7 @@ public class GameManager : MonoBehaviour {
         uiRollDice.gameObject.SetActive(true);
         uiRollResult.gameObject.SetActive(false);
         uiSkipTurn.gameObject.SetActive(false);
+        canRoll = true;
         animateRollResult = false;
         Debug.Log("Current player is now " + currentPlayer);
     }
@@ -86,6 +93,7 @@ public class GameManager : MonoBehaviour {
             Debug.Log("Landed on a rosette, re-rolled");
             uiRollDice.gameObject.SetActive(true);
             uiSkipTurn.gameObject.SetActive(false);
+            canRoll = true;
         } else {
             if (movesRemaining <= 0) {
                 togglePlayer();
@@ -138,6 +146,7 @@ public class GameManager : MonoBehaviour {
         movesRemaining = rollDice();
         uiRollDice.gameObject.SetActive(false);
         uiRollResult.gameObject.SetActive(true);
+        canRoll = false;
         uiRollResult.text = LocalizationManager.instance.GetLocalizedValue("roll_result", movesRemaining.ToString());
         animateRollResult = true;
         animateRollResultTimeStarted = Time.time;
@@ -155,6 +164,7 @@ public class GameManager : MonoBehaviour {
         uiRollDice.gameObject.SetActive(false);
         uiRollResult.gameObject.SetActive(false);
         uiSkipTurn.gameObject.SetActive(false);
+        canRoll = false;
         currentPlayer = 0;
     }
 }
