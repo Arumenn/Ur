@@ -20,6 +20,12 @@ public class LocalizationManager : MonoBehaviour {
         }
 
         DontDestroyOnLoad(gameObject);
+        //loads default language based on system
+        if (Application.systemLanguage == SystemLanguage.French) {
+            LoadLocalizedText("localizedText_fr.json");
+        } else {
+            LoadLocalizedText("localizedText_en.json");
+        }
     }
 
     public void LoadLocalizedText(string fileName) {
