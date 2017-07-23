@@ -38,6 +38,21 @@ public class Pawn : MonoBehaviour {
             ground.Raycast(ray, out dist);
             Vector3 pos = ray.GetPoint(dist);
             transform.position = pos;
+
+            //Raycasting to detect Squares
+            var down = transform.TransformDirection(Vector3.down);
+            RaycastHit squareHit;
+            Debug.DrawRay(transform.position, down * 2, Color.green);
+            if (Physics.Raycast(transform.position, down, out squareHit, 2)) {
+                if (squareHit.collider.gameObject.GetComponent<Square>() != null) {
+                    Debug.Log("Hit a square! " + squareHit.collider.gameObject.name);
+                    currentSquare = squareHit.collider.gameObject.GetComponent<Square>();
+                    Debug.Log(name + " is hovering over " + currentSquare.position);
+                } else {
+                    Debug.Log("Hit something else " + squareHit.collider.gameObject.name);
+                    currentSquare = null;
+                }
+            }
         }
 	}
 
@@ -152,20 +167,20 @@ public class Pawn : MonoBehaviour {
         Debug.Log("Cancelled movement");
     }
 
-    private void OnTriggerEnter(Collider other) {
+    /*private void OnTriggerEnter(Collider other) {
         Square square = other.gameObject.GetComponent<Square>();
         if (square) {
             Debug.Log(name + " entering " + square.position);
             if ((currentSquare != square)) {
                 currentSquare = square;
                 Debug.Log(name + " is hovering over " + square.position);
-                /*square.currentPawn = this;
-                Debug.Log(square.position + " is free so we set " + name + " as pawn");*/
+                //square.currentPawn = this;
+                //Debug.Log(square.position + " is free so we set " + name + " as pawn");
             }
         }
-    }
+    }*/
 
-    private void OnTriggerExit(Collider other) {
+    /*private void OnTriggerExit(Collider other) {
         Square square = other.gameObject.GetComponent<Square>();
         if (square) {
             Debug.Log(name + " leaving " + square.position);
@@ -174,7 +189,7 @@ public class Pawn : MonoBehaviour {
                 other.gameObject.GetComponent<Square>().currentPawn = null;
             }
         }
-    }
+    }*/
 
     public void pushOut() {
         Debug.Log(name + " is dead");
