@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour {
     public Text uiWinText;
     public Text uiPlayer1Score;
     public Text uiPlayer2Score;
+    public Text uiDebug;
 
     public int currentPlayer = 1;
     public Pawn currentlySelectedPawn = null;
@@ -29,8 +30,13 @@ public class GameManager : MonoBehaviour {
     private float animateRollResultTimeStarted = 0f;
     private const float TIMETOWAIT_ROLLRESULT = 3f;
 
-	// Use this for initialization
-	void Start () {
+    private Texture2D[] cursors;
+    private const int CURSOR_NORMAL = 0;
+    private const int CURSOR_INVALID = 1;
+    private const int CURSOR_ATTACK = 2;
+
+    // Use this for initialization
+    void Start () {
         currentPlayer = 1;
         uiRollDice.gameObject.SetActive(true);
         uiRollResult.gameObject.SetActive(false);
@@ -40,6 +46,11 @@ public class GameManager : MonoBehaviour {
 
         uiPlayer1Score.color = colorPlayer1;
         uiPlayer2Score.color = colorPlayer2;
+
+        cursors = new Texture2D[3];
+        cursors[0] = (Texture2D)Resources.Load("Cursor_Normal");
+        cursors[1] = (Texture2D)Resources.Load("Cursor_Invalid");
+        cursors[2] = (Texture2D)Resources.Load("Cursor_Attack");
     }
 	
 	// Update is called once per frame
@@ -72,6 +83,50 @@ public class GameManager : MonoBehaviour {
         if ((canRoll) && (Input.GetKeyDown(KeyCode.Space))) {
             buttonRollDice();
         }
+    }
+
+    private void LateUpdate() {
+        string text;
+        text = "";
+        int cursorIndex = CURSOR_NORMAL;
+        if ((currentlySelectedPawn != null) && (currentlySelectedPawn.currentSquare != null)){
+            if (currentlySelectedPawn.currentSquare.isOccupied) {
+                if (currentlySelectedPawn.currentSquare.currentPawn.playerOwner == currentPlayer) {
+                    //can't move on my own pawns
+                    text = "Can't move-Blocked";
+                    cursorIndex = CURSOR_INVALID;
+                } else if (currentlySelectedPawn.currentSquare.squareTerritory == 0) {
+                    //can push out and move
+                    if (currentlySelectedPawn.checkValidMovement()) {
+                        text = "Can attack";
+                        cursorIndex = CURSOR_ATTACK;
+                    } else {
+                        text = "Can't move-Move cost";
+                        cursorIndex = CURSOR_INVALID;
+                    }
+                } else {
+                    text = "Can't move-WrongPath";
+                    cursorIndex = CURSOR_INVALID;
+                }
+            } else {
+                if ((currentlySelectedPawn.currentSquare.squareTerritory == currentPlayer) || (currentlySelectedPawn.currentSquare.squareTerritory == 0)) {
+                    if (currentlySelectedPawn.checkValidMovement()) {
+                        //can move
+                        text = "Can move";
+                        cursorIndex = CURSOR_NORMAL;
+                    } else {
+                        //can't move
+                        text = "Can't move-Move cost";
+                        cursorIndex = CURSOR_INVALID;
+                    }
+                } else {
+                    text = "Can't move-Wrong path";
+                    cursorIndex = CURSOR_INVALID;
+                }
+            }
+        }
+        uiDebug.text = text;
+        Cursor.SetCursor(cursors[cursorIndex], new Vector2(0,0), CursorMode.Auto);
     }
 
     public void togglePlayer() {

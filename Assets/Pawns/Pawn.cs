@@ -7,12 +7,12 @@ public class Pawn : MonoBehaviour {
     public int playerOwner = 0;
     public PawnState pawnState = PawnState.waiting;
     public Square currentSquare = null;
+    public int lastPosition = 0;
 
     private GameManager gm;
     private GameCamera gc;
     private float heightOffset = 0.15f;
     private float groundOffset = -0.25f;
-    [SerializeField] private int lastPosition = 0;
     private Vector3 originalPosition;
 
     //for undo
@@ -52,6 +52,9 @@ public class Pawn : MonoBehaviour {
                     Debug.Log("Hit something else " + squareHit.collider.gameObject.name);
                     currentSquare = null;
                 }
+            } else {
+                Debug.Log("Hit nothing");
+                currentSquare = null;
             }
         }
 	}
@@ -87,7 +90,17 @@ public class Pawn : MonoBehaviour {
                 gm.currentlySelectedPawn = this;
                 pawnState = PawnState.waiting;
             } else if (gm.currentlySelectedPawn == this) {
-                if ((currentSquare != null) && (currentSquare.position >= lastPosition)) {
+                if (checkValidMovement()) {
+                    if (PlacePawn()) {
+                        gm.currentlySelectedPawn = null;
+                        gm.consumeMoves(gm.movesRemaining, currentSquare.squareType);
+                    }
+                } else {
+                    pawnState = PawnState.waiting;
+                    Debug.Log("Invalid placement clicked for " + name);
+                }
+
+                /*if ((currentSquare != null) && (currentSquare.position >= lastPosition)) {
                     int moveCost = currentSquare.position - lastPosition;
                     if (moveCost > gm.movesRemaining) {
                         Debug.LogWarning("Not enough moves remaining");
@@ -95,17 +108,31 @@ public class Pawn : MonoBehaviour {
                         Debug.LogWarning("You have to use all the moves");
                     } else {
                         Debug.Log("Valid square clicked for " + name);
-                        if (PlacePawn()) {
-                            gm.currentlySelectedPawn = null;
-                            gm.consumeMoves(moveCost, currentSquare.squareType);
-                        }
+                        
                     }
                 } else {
                     pawnState = PawnState.waiting;
                     Debug.Log("Invalid placement clicked for " + name);
-                }
+                }*/
             }
         }
+    }
+
+    public bool checkValidMovement() {
+        if ((currentSquare != null) && (currentSquare.position >= lastPosition)) {
+            int moveCost = currentSquare.position - lastPosition;
+            if (moveCost > gm.movesRemaining) {
+                Debug.LogWarning("Not enough moves remaining");
+                return false;
+            } else if (moveCost < gm.movesRemaining) {
+                Debug.LogWarning("You have to use all the moves");
+                return false;
+            } else {
+                Debug.Log("Valid square for " + name);
+                return true;
+            }
+        }
+        return false;
     }
 
     private bool PlacePawn() {

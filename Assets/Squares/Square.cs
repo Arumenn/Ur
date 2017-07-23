@@ -10,8 +10,6 @@ public class Square : MonoBehaviour {
     public Pawn currentPawn = null;
     public int position = 0;
 
-    private GameManager gm;
-
     public bool isOccupied {
         get { return currentPawn != null; }
     }
@@ -22,7 +20,7 @@ public class Square : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        gm = GameObject.FindObjectOfType<GameManager>();
+
     }
 	
 	// Update is called once per frame
@@ -35,7 +33,10 @@ public class Square : MonoBehaviour {
             if (squareType == SquareType.Home) {
                 Debug.Log(replacement.name + " is now home!");
                 replacement.gotHome();
-                gm.scorePoint();
+                GameManager gm = GameObject.FindObjectOfType<GameManager>();
+                if (gm != null) {
+                    gm.scorePoint();
+                }
             } else {
                 currentPawn = replacement;
                 Debug.Log("Set current spawn to " + replacement.name);
