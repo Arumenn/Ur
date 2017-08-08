@@ -146,7 +146,12 @@ public class Pawn : MonoBehaviour {
                         return Snap();
                     } else if (currentSquare.currentPawn.playerOwner != playerOwner) {
                         Debug.Log("by an other player's pawn");
-                        return Snap();
+                        if (currentSquare.position == 8) {
+                            Debug.Log("Can't attack on a safe space");
+                            return false;
+                        } else {
+                            return Snap();
+                        }
                     }
                 } else {
                     Debug.Log("Square " + currentSquare.position + " is free...");

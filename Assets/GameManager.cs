@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour {
     public Pawn currentlySelectedPawn = null;
     public int movesRemaining = 0; //will be updated when dice rolled
     private bool canRoll = false;
+    private bool hasAlreadyRerolled = false;
 
     public int scorePlayer1 = 0;
     public int scorePlayer2 = 0;
@@ -45,6 +46,7 @@ public class GameManager : MonoBehaviour {
         uiWinText.gameObject.SetActive(false);
         uiTips.SetActive(false);
         canRoll = true;
+        hasAlreadyRerolled = false;
 
         uiPlayer1Score.color = colorPlayer1;
         uiPlayer2Score.color = colorPlayer2;
@@ -102,7 +104,10 @@ public class GameManager : MonoBehaviour {
                     cursorIndex = CURSOR_INVALID;
                 } else if (currentlySelectedPawn.currentSquare.squareTerritory == 0) {
                     //can push out and move
-                    if (currentlySelectedPawn.checkValidMovement()) {
+                    if (currentlySelectedPawn.currentSquare.position == 8) {
+                        text = "Can't attack-Safe space";
+                        cursorIndex = CURSOR_INVALID;
+                    } else if (currentlySelectedPawn.checkValidMovement()) {
                         text = "Can attack";
                         cursorIndex = CURSOR_ATTACK;
                     } else {
@@ -140,6 +145,7 @@ public class GameManager : MonoBehaviour {
         uiRollResult.gameObject.SetActive(false);
         uiSkipTurn.gameObject.SetActive(false);
         canRoll = true;
+        hasAlreadyRerolled = false;
         animateRollResult = false;
         Debug.Log("Current player is now " + currentPlayer);
     }
@@ -148,11 +154,12 @@ public class GameManager : MonoBehaviour {
         movesRemaining -= moveCost;
         Debug.Log(moveCost + " move(s) used, " + movesRemaining + " remaining");
 
-        if (squareType == SquareType.Rosette) {
+        if ((squareType == SquareType.Rosette) && (hasAlreadyRerolled == false)) {
             //Allow reroll
-            Debug.Log("Landed on a rosette, re-rolled");
+            Debug.Log("Landed on a rosette, allow re-roll");
             uiRollDice.gameObject.SetActive(true);
             uiSkipTurn.gameObject.SetActive(false);
+            hasAlreadyRerolled = true;
             canRoll = true;
         } else {
             if (movesRemaining <= 0) {
