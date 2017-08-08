@@ -22,11 +22,7 @@ public class GameManager : MonoBehaviour {
     private bool canRoll = false;
     private bool hasAlreadyRerolled = false;
 
-    public int scorePlayer1 = 0;
-    public int scorePlayer2 = 0;
-
-    private Color colorPlayer1 = new Color(255, 0, 90);
-    private Color colorPlayer2 = new Color(0, 139, 255);
+    private PlayerManager pm;
 
     private bool animateRollResult = false;
     private float animateRollResultTimeStarted = 0f;
@@ -38,7 +34,11 @@ public class GameManager : MonoBehaviour {
     private const int CURSOR_ATTACK = 2;
 
     // Use this for initialization
-    void Start () {
+    private IEnumerator Start() {
+        //waits for the localization manager to be ready
+        while (!LocalizationManager.instance.GetIsReady()) {
+            yield return null;
+        }
         currentPlayer = 1;
         uiRollDice.gameObject.SetActive(true);
         uiRollResult.gameObject.SetActive(false);
@@ -48,8 +48,10 @@ public class GameManager : MonoBehaviour {
         canRoll = true;
         hasAlreadyRerolled = false;
 
-        uiPlayer1Score.color = colorPlayer1;
-        uiPlayer2Score.color = colorPlayer2;
+        pm = FindObjectOfType<PlayerManager>();
+
+        uiPlayer1Score.color = pm.colorPlayer1;
+        uiPlayer2Score.color = pm.colorPlayer2;
 
         cursors = new Texture2D[3];
         cursors[0] = (Texture2D)Resources.Load("Cursor_Normal");
@@ -60,16 +62,16 @@ public class GameManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         //uiPlayerName.text = "Player " + currentPlayer;
-        uiPlayerName.text = LocalizationManager.instance.GetLocalizedValue("current_player", currentPlayer.ToString());
+        uiPlayerName.text = LocalizationManager.instance.GetLocalizedValue("current_player", pm.GetPlayerName(currentPlayer));
         uiMovementsLeft.text = LocalizationManager.instance.GetLocalizedValue("moves_remaining", movesRemaining.ToString());
         if (currentPlayer == 1) {
-            uiPlayerName.color = colorPlayer1;
+            uiPlayerName.color = pm.colorPlayer1;
         } else {
-            uiPlayerName.color = colorPlayer2;
+            uiPlayerName.color = pm.colorPlayer2;
         }
 
-        uiPlayer1Score.text = LocalizationManager.instance.GetLocalizedValue("score_player", "1", scorePlayer1.ToString());
-        uiPlayer2Score.text = LocalizationManager.instance.GetLocalizedValue("score_player", "2", scorePlayer2.ToString());
+        uiPlayer1Score.text = LocalizationManager.instance.GetLocalizedValue("score_player", pm.GetPlayerName(1), pm.scorePlayer1.ToString());
+        uiPlayer2Score.text = LocalizationManager.instance.GetLocalizedValue("score_player", pm.GetPlayerName(2), pm.scorePlayer2.ToString());
 
         if (animateRollResult) {
             if (Time.time - animateRollResultTimeStarted > TIMETOWAIT_ROLLRESULT) {
@@ -173,13 +175,13 @@ public class GameManager : MonoBehaviour {
     public void scorePoint() {
         Debug.Log("Player " + currentPlayer + " has got 1 pawn home!");
         if (currentPlayer == 1) {
-            scorePlayer1++;
-            if (scorePlayer1 == 7) {
+            pm.scorePlayer1++;
+            if (pm.scorePlayer1 == 7) {
                 Win();
             }
         } else {
-            scorePlayer2++;
-            if (scorePlayer2 == 7) {
+            pm.scorePlayer2++;
+            if (pm.scorePlayer2 == 7) {
                 Win();
             }
         }
