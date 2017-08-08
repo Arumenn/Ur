@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour {
     public Text uiPlayer1Score;
     public Text uiPlayer2Score;
     public Text uiDebug;
+    public GameObject uiTips;
 
     public int currentPlayer = 1;
     public Pawn currentlySelectedPawn = null;
@@ -42,6 +43,7 @@ public class GameManager : MonoBehaviour {
         uiRollResult.gameObject.SetActive(false);
         uiSkipTurn.gameObject.SetActive(false);
         uiWinText.gameObject.SetActive(false);
+        uiTips.SetActive(false);
         canRoll = true;
 
         uiPlayer1Score.color = colorPlayer1;
@@ -83,6 +85,9 @@ public class GameManager : MonoBehaviour {
         if ((canRoll) && (Input.GetKeyDown(KeyCode.Space))) {
             buttonRollDice();
         }
+
+
+        uiTips.SetActive(currentlySelectedPawn != null);
     }
 
     private void LateUpdate() {
