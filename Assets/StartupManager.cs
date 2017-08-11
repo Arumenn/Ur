@@ -34,7 +34,7 @@ public class StartupManager : MonoBehaviour {
             pm.player2Name = uiPlayer2Name.text;
             if (pm.player1Name == "") { pm.player1Name = LocalizationManager.instance.GetLocalizedValue("PlaceholderPlayer1"); }
             if (pm.player2Name == "") { pm.player2Name = LocalizationManager.instance.GetLocalizedValue("PlaceholderPlayer2"); }
-            SceneManager.LoadScene("Sandbox");
+            SceneManager.LoadScene("Egypt");
         } else {
             Debug.LogError("No PlayerManager found");
         }
